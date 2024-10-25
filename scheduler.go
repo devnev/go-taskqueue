@@ -38,11 +38,11 @@ func Start(tasks TaskSet) (start <-chan string, done chan<- string) {
 			// Handle any pending completion events to give a better idea of the current state of work
 			for {
 				var completed string
-				var doneClosed bool
+				var doneOpen bool
 				select {
 				case completed = <-peeked:
-				case completed, doneClosed = <-doneEvents:
-					if doneClosed {
+				case completed, doneOpen = <-doneEvents:
+					if !doneOpen {
 						// no more workers, no point in scheduling anything
 						return
 					}
@@ -101,8 +101,8 @@ func Start(tasks TaskSet) (start <-chan string, done chan<- string) {
 			}
 			if nextTask != "" {
 				select {
-				case completed, doneClosed := <-doneEvents:
-					if doneClosed {
+				case completed, doneOpen := <-doneEvents:
+					if !doneOpen {
 						// No more workers, no point in scheduling anything
 						return
 					}
@@ -120,8 +120,8 @@ func Start(tasks TaskSet) (start <-chan string, done chan<- string) {
 
 			// We can't start anything, but there's something running, wait for it to finish
 			if len(startedTasks) > 0 {
-				completed, doneClosed := <-doneEvents
-				if doneClosed {
+				completed, doneOpen := <-doneEvents
+				if !doneOpen {
 					// No more workers, no point in scheduling anything
 					return
 				}

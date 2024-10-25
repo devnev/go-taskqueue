@@ -82,7 +82,7 @@ func FromMapper[T any](items []T, namer func(T) string, deps func(T) []string, g
 			return TaskSet{}, fmt.Errorf("%w", ErrEmptyName)
 		}
 		if _, exists := set[name]; exists {
-			return TaskSet{}, fmt.Errorf("%w %q", ErrDuplicateName, namer)
+			return TaskSet{}, fmt.Errorf("%w %q", ErrDuplicateName, name)
 		}
 		t := Task{Name: name}
 		if deps != nil {
